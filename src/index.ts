@@ -1,21 +1,20 @@
-const express = require("express");
-const path = require("path");
+import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
+
 const app = express();
 
-// 配置别名
-require("module-alias/register");
-const aliases = {
-  "@": path.resolve(__dirname, "./"),
-  "@router": path.resolve(__dirname, "./router"),
-};
-require("module-alias").addAliases(aliases);
+/**
+ * 端口号
+ * @type {number} _port
+ */
+const _port: number = 3001;
 
 // bodyParser 解析
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 跨域
-app.all("*", function (req, res, next) {
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "*");
   res.header("Access-Control-Allow-Methods", "*");
@@ -32,33 +31,29 @@ app.all("*", function (req, res, next) {
 });
 
 // 路由
-const test = require("@router/test/test");
+import test from '@/router/test/test';
 app.use("/test", test);
-
-/**
- * 端口号
- * @type {number} _port
- */
-const _port = 3000;
 
 /**
  * 启动服务器
  * @param {number} port - 端口号
  */
-function startServer(port) {
-  app.get("/", (req, res) => {
+function startServer(port: number) {
+  app.get("/", (req: Request, res: Response) => {
     console.log(req);
     res.status(200).json("hello world");
   });
 
   // 指定 error链接
-  app.use("/error", (req, res) => {
+  app.use("/error", (req: Request, res: Response) => {
     res.status(404).send("error");
   });
 
   // 将未定义URL重定向 为 错误处理：未知请求
-  app.use("*", (req, res, err) => {
-    res.status(404).json(err);
+  app.use((req: Request, res: Response) => {
+    res.status(404).json({ 
+      code: 404,
+      error: 'Pages Not Found' });
   });
 
   app.listen(port, () => {
