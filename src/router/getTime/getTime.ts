@@ -138,8 +138,16 @@ function consolidateData(data: Title): Title {
 }
 
 // GET 请求处理
-router.get("/", (req, res) => {
+router.get("/monitor", (req, res) => {
   res.sendFile(path.join(__dirname, "getTime.html"));
+});
+
+router.get("/", (req: Request, res: Response) => {
+  res.status(200).json({
+    code: 200,
+    msg: "success",
+    data: JSON.parse(JSON.stringify(readJsonFile(getCurrentDateFileName()))),
+  });
 });
 
 // POST 请求处理

@@ -21,7 +21,7 @@
       let password = "";
       password = prompt("请输入密码");
       if (password === "fh") {
-        fetch(`http://localhost:3001/getTime/setLimit?type=always&limit=${limit}`)
+        fetch(`http://localhost:3301/getTime/setLimit?type=always&limit=${limit}`)
           .then((response) => {
             if (!response.ok) {
               throw new Error("Network response was not ok");
@@ -49,7 +49,7 @@
       let password = "";
       password = prompt("请输入密码");
       if (password === "fh") {
-        fetch(`http://localhost:3001/getTime/setLimit?type=today&limit=${limit}`)
+        fetch(`http://localhost:3301/getTime/setLimit?type=today&limit=${limit}`)
           .then((response) => {
             if (!response.ok) {
               throw new Error("Network response was not ok");
@@ -251,7 +251,7 @@
     };
 
     // 发送 GET 请求并绘制图表
-    fetch("http://localhost:3001/getTime")
+    fetch("http://localhost:3301/getTime")
       .then((response) => response.json())
       .then((result) => {
         const data = F1(result.data);
