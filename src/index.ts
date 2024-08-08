@@ -7,7 +7,7 @@ const app = express();
  * 端口号
  * @type {number} _port
  */
-const _port: number = 3001;
+const _port: number = 3301;
 
 // bodyParser 解析
 app.use(express.json());
