@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ECharts Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <div class="main" style="width: 100vw; height: 100vh"></div>
+    <div class="fix">
+      <button class="setLimit">设置超时</button><br />
+      <button class="setToday">今日继续</button>
+    </div>
+  </body>
+  <script>
+    document.querySelector(".setLimit").addEventListener("click", () => {
+      let limit = 0;
+      limit = prompt("输入限制时间(分钟)", 120);
+      let login = false;
+      let password = "";
+      password = prompt("请输入密码");
+      if (password === "fh") {
+        fetch(`http://localhost:3001/getTime/setLimit?type=always&limit=${limit}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json(); // 将响应解析为 JSON 格式
+          })
+          .then((data) => {
+            console.log("Returned data:", data);
+            alert(data.msg);
+            location.reload();
+            // 在这里处理返回的 data
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          });
+      } else {
+        alert("密码错误");
+      }
+    });
+
+    document.querySelector(".setToday").addEventListener("click", () => {
+      let limit = 0;
+      limit = prompt("输入今日还可以玩的时间(分钟)", 30);
+      let login = false;
+      let password = "";
+      password = prompt("请输入密码");
+      if (password === "fh") {
+        fetch(`http://localhost:3001/getTime/setLimit?type=today&limit=${limit}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json(); // 将响应解析为 JSON 格式
+          })
+          .then((data) => {
+            console.log("Returned data:", data);
+            // 在这里处理返回的 data
+            alert(data.msg);
+            location.reload();
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          });
+        alert(limit);
+      } else {
+        alert("密码错误");
+      }
+    });
+
+    let XA = [];
+    function slice_reverse_arr(data) {
+      let obj = addProgram(data);
+
+      const entries = Object.entries(obj);
+
+      entries.sort(([, valueA], [, valueB]) => valueA - valueB);
+      let reverseArr = entries.reverse().slice(2);
+      let other = ["其他", 0];
+      for (let i = 0; i < reverseArr.length; i++) {
+        if (reverseArr[i][1] > 30) {
+          if (data[reverseArr[i][0]].program) {
+            let _other = ["其他", 0];
+            let _XA = [];
+            console.log(Object.entries(data[reverseArr[i][0]].program));
+            console.log("---");
+
+            for (let j = 0; j < Object.entries(data[reverseArr[i][0]].program).length; j++) {
+              if (Object.entries(data[reverseArr[i][0]].program)[j][1] > 10) {
+                _XA.push(Object.entries(data[reverseArr[i][0]].program)[j]);
+              } else {
+                _other[1] += Object.entries(data[reverseArr[i][0]].program)[j][1];
+              }
+            }
+
+            _XA.push(_other);
+
+            _XA.sort((a, b) => {
+              return a[1] - b[1];
+            });
+
+            XA.push((reverseArr[i] = [...reverseArr[i], _XA]));
+            console.log(XA);
+          } else {
+            XA.push(reverseArr[i]);
+          }
+          // XA.push(reverseArr[i] = [...reverseArr[i] , ]);
+        } else {
+          other[1] += reverseArr[i][1];
+        }
+      }
+      XA.push(other);
+
+      XA.reverse();
+      //console.log(XA);
+    }
+
+    function addProgram(data) {
+      // 处理嵌套的 program 数据
+      const processedData = {};
+      for (const key in data) {
+        if (data.hasOwnProperty(key)) {
+          if (typeof data[key] === "object" && data[key].program) {
+            // 累加 program 对象中的数值
+            const programData = data[key].program;
+            const total = Object.values(programData).reduce((sum, value) => sum + value, 0);
+            processedData[key] = total;
+          } else {
+            processedData[key] = data[key];
+          }
+        }
+      }
+      return processedData;
+    }
+
+    // // 初始化 ECharts 实例
+    const myChart = echarts.init(document.querySelector(".main"));
+
+    const F1 = (data) => {
+      slice_reverse_arr(data);
+      console.log(data.all);
+
+      option = {
+        title: {
+          text: `已使用 ${((data.all - data.Limit) / 60).toFixed()}分钟\n超时限制${data.Limit / 60}分钟`,
+          left: "center",
+        },
+        grid: {
+          left: "30%", // 设置左侧文字的宽度
+        },
+        yAxis: {
+          data: XA.map((item) => String(item[0])),
+        },
+        tooltip: {
+          trigger: "axis", // 或者 'item'，根据实际需求选择
+          axisPointer: {
+            type: "shadow", // 默认为直线，可选为：'line' | 'shadow'
+          },
+          formatter: function (params) {
+            var param = params[0];
+            return param.name + ": " + param.value;
+          },
+        },
+        xAxis: {},
+        dataGroupId: "",
+        animationDurationUpdate: 500,
+        series: {
+          type: "bar",
+          id: "sales",
+          data: XA.map((item) => {
+            return { value: item[1], groupId: item[0] };
+          }),
+
+          universalTransition: {
+            enabled: true,
+            divideShape: "clone",
+          },
+        },
+        label: {
+          show: true,
+          position: "right", // 在柱状图的右侧显示
+          formatter: "{c}秒", // '{c}' 代表当前数据的值
+        },
+      };
+
+      let DR = [];
+
+      XA.map((item) => {
+        if (item[2]) {
+          DR.push({
+            dataGroupId: item[0],
+            data: item[2],
+          });
+        }
+      });
+
+      //console.log(DR);
+
+      const drilldownData = DR;
+
+      myChart.on("click", function (event) {
+        if (event.data) {
+          var subData = drilldownData.find(function (data) {
+            return data.dataGroupId === event.data.groupId;
+          });
+          if (!subData) {
+            return;
+          }
+          myChart.setOption({
+            yAxis: {
+              data: subData.data.map(function (item) {
+                return item[0];
+              }),
+            },
+            xAxis: {},
+            series: {
+              type: "bar",
+              id: "sales",
+              dataGroupId: subData.dataGroupId,
+              data: subData.data.map(function (item) {
+                return item[1];
+              }),
+              universalTransition: {
+                enabled: true,
+                divideShape: "clone",
+              },
+            },
+            graphic: [
+              {
+                type: "text",
+                left: 50,
+                top: 20,
+                style: {
+                  text: "返回",
+                  fontSize: 18,
+                },
+                onclick: function () {
+                  myChart.setOption(option);
+                },
+              },
+            ],
+          });
+        }
+      });
+
+      // 使用配置项生成图表
+      myChart.setOption(option);
+    };
+
+    // 发送 GET 请求并绘制图表
+    fetch("http://localhost:3001/getTime")
+      .then((response) => response.json())
+      .then((result) => {
+        const data = F1(result.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  </script>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+    .fix {
+      position: fixed;
+      right: 0;
+      top: 0;
+    }
+    button {
+      margin-bottom: 5px;
+      padding: 5px;
+      border: 1px;
+      border-radius: 10px;
+      background-color: rgba(117, 150, 179, 0.432);
+    }
+  </style>
+</html>

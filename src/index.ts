@@ -1,5 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
-import path from 'path';
+import express, { Request, Response, NextFunction } from "express";
+import path from "path";
 
 const app = express();
 
@@ -31,8 +31,12 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 // 路由
-import test from '@/router/test/test';
+import test from "@/router/test/test";
 app.use("/test", test);
+import getTime from "@/router/getTime/getTime";
+app.use("/getTime", getTime);
+import chart from "@/router/chart/chart";
+app.use("/chart", chart);
 
 /**
  * 启动服务器
@@ -40,7 +44,6 @@ app.use("/test", test);
  */
 function startServer(port: number) {
   app.get("/", (req: Request, res: Response) => {
-    console.log(req);
     res.status(200).json("hello world");
   });
 
@@ -51,9 +54,10 @@ function startServer(port: number) {
 
   // 将未定义URL重定向 为 错误处理：未知请求
   app.use((req: Request, res: Response) => {
-    res.status(404).json({ 
+    res.status(404).json({
       code: 404,
-      error: 'Pages Not Found' });
+      error: "Pages Not Found",
+    });
   });
 
   app.listen(port, () => {
