@@ -18,12 +18,24 @@ const readJsonFile = (fileName: string): Title => {
   const filePath = path.join(__dirname, fileName);
 
   if (!fs.existsSync(filePath)) {
+    fs.readFile(settingFile, "utf8", (err, data) => {
+      if (err) {
+        console.error("读取文件时发生错误:", err);
+        return;
+      }
+      try {
+        const settings = JSON.parse(data);
+        console.log("文件内容:", settings);
+        const initialData: Title = {
+          Limit: settings.Limit,
+        };
+        fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2), "utf-8");
+        return initialData;
+      } catch (parseErr) {
+        console.error("解析 JSON 时发生错误:", parseErr);
+      }
+    });
     //console.log(`File does not exist. Creating a new file: ${fileName}`);
-    const initialData: Title = {
-      Limit: 1 * 60 * 60 * 3,
-    };
-    fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2), "utf-8");
-    return initialData;
   }
 
   try {
