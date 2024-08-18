@@ -31,11 +31,11 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 // 路由
-import test from "@/router/test/test";
+import test from "./router/test/test";
 app.use("/test", test);
-import getTime from "@/router/getTime/getTime";
+import getTime from "./router/getTime/getTime";
 app.use("/getTime", getTime);
-import chart from "@/router/chart/chart";
+import chart from "./router/chart/chart";
 app.use("/chart", chart);
 
 /**

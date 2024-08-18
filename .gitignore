@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist/*
 .DS_Store
 *.local
 src/router/getTime/*.json

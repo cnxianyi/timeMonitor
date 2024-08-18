@@ -69,10 +69,15 @@ const calculateTotal = (data: Title): number => {
       }
     }
   };
-
   accumulateTotal(data);
+  console.log("??");
+  console.log(data.all);
+  console.log(data.Limit);
+  console.log(total);
 
-  return total;
+  //data.all = data.all - (data.limit as number);
+
+  return total - +data.Limit;
 };
 
 // 合并数据
@@ -179,14 +184,14 @@ router.post("/", (req: Request, res: Response) => {
   const allValue = mergedData.all as number;
   const limitValue = mergedData.Limit as number;
 
-  console.log("今日时间:", allValue - limitValue);
+  console.log("今日时间:", allValue);
   console.log("剩余时间:", limitValue - (allValue - limitValue));
 
   res.status(200).json({
     code: 200,
     msg: "success",
     data: {
-      time: limitValue - (allValue - limitValue),
+      time: limitValue - allValue,
     },
   });
 });
