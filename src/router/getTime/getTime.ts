@@ -191,7 +191,7 @@ router.post("/", (req: Request, res: Response) => {
     code: 200,
     msg: "success",
     data: {
-      time: limitValue - allValue,
+      time: limitValue - allValue || 7200,
     },
   });
 });
