@@ -5,12 +5,13 @@ import * as path from "path";
 
 const router = Router();
 
-// 获取当前日期，并格式化为 MM-DD
-const getCurrentDateFileName = (): string => {
-  const now = new Date();
+// 获取当前日期，并格式化为 TT-MM-DD
+const getCurrentDateFileName = (date: string = new Date().toISOString()): string => {
+  const now = new Date(date);
+  const year = String(now.getFullYear())
   const month = String(now.getMonth() + 1).padStart(2, "0"); // 月份 (1-12)
   const day = String(now.getDate()).padStart(2, "0"); // 日期 (1-31)
-  return `${month}-${day}.json`;
+  return `${year}-${month}-${day}.json`;
 };
 
 // 读取 JSON 文件
@@ -163,7 +164,7 @@ router.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     code: 200,
     msg: "success",
-    data: JSON.parse(JSON.stringify(readJsonFile(getCurrentDateFileName()))),
+    data: JSON.parse(JSON.stringify(readJsonFile(getCurrentDateFileName(req.query.date as string)))),
   });
 });
 
